@@ -56,7 +56,6 @@ export default function EpochTool() {
 
   return (
     <div className="flex flex-col gap-3">
-      {/* live now strip */}
       <div className="grid gap-2 sm:grid-cols-3">
         {[
           ['now · seconds', String(Math.floor(now / 1000))],

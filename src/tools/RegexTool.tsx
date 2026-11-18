@@ -97,7 +97,6 @@ export default function RegexTool() {
 
   return (
     <div className="flex flex-col gap-3">
-      {/* pattern bar */}
       <div
         className={cx(
           'flex flex-wrap items-center gap-2 rounded-xl border bg-panel p-2 pl-4 transition',

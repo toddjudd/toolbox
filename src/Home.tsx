@@ -66,7 +66,6 @@ export default function Home({ onPalette }: { onPalette: () => void }) {
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-8 sm:px-6 sm:py-12">
-      {/* hero */}
       <section className="flex flex-col items-center gap-2 text-center">
         <div className="text-xs tracking-widest text-dim uppercase">{greeting(date.getHours())}</div>
         <div className="glow font-semibold text-accent tabular-nums" style={{ fontSize: 'clamp(3rem, 10vw, 6rem)', lineHeight: 1 }}>
@@ -80,7 +79,6 @@ export default function Home({ onPalette }: { onPalette: () => void }) {
         </div>
       </section>
 
-      {/* search */}
       <form
         className="mx-auto w-full max-w-2xl"
         onSubmit={(e) => {
@@ -139,7 +137,6 @@ export default function Home({ onPalette }: { onPalette: () => void }) {
       <div className="grid gap-5 lg:grid-cols-[1fr_20rem]">
         <div className="flex min-w-0 flex-col gap-5">
           <SmartPaste />
-          {/* tools grid */}
           <section>
             <div className="label mb-2 flex items-center justify-between">
               <span>tools</span>

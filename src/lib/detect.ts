@@ -27,7 +27,6 @@ export function detect(raw: string): Detection[] {
   if (!s) return out
   const now = Date.now()
 
-  // JWT
   if (/^eyJ[\w-]*\.eyJ[\w-]*\.[\w-]*$/.test(s)) {
     let preview = 'JSON Web Token'
     try {
@@ -35,13 +34,10 @@ export function detect(raw: string): Detection[] {
       const p = JSON.parse(dec.decode(b64ToBytes(s.split('.')[1])))
       const bits = [h.alg && `alg ${h.alg}`, p.sub && `sub ${p.sub}`, typeof p.exp === 'number' && `exp ${relTime(p.exp * 1000, now)}`]
       preview = bits.filter(Boolean).join(' · ')
-    } catch {
-      /* keep default */
-    }
+    } catch {}
     out.push({ tool: 'jwt', label: 'Decode JWT', preview, confidence: 'high', apply: open('jwt', { 'jwt:input': s }) })
   }
 
-  // JSON
   if (/^[[{"]/.test(s)) {
     try {
       const v = JSON.parse(s)
@@ -65,7 +61,6 @@ export function detect(raw: string): Detection[] {
     }
   }
 
-  // URL
   if (/^[a-z][a-z0-9+.-]*:\/\/\S+$/i.test(s)) {
     try {
       const u = new URL(s)
@@ -77,9 +72,7 @@ export function detect(raw: string): Detection[] {
         confidence: 'high',
         apply: open('url', { 'url:tab': 'parse', 'url:parse': s }),
       })
-    } catch {
-      /* not a URL */
-    }
+    } catch {}
   }
   if (/%[0-9a-f]{2}/i.test(s)) {
     let preview = ''
@@ -97,7 +90,6 @@ export function detect(raw: string): Detection[] {
     })
   }
 
-  // timestamps
   if (/^-?\d{9,19}(\.\d+)?$/.test(s)) {
     const digits = s.replace(/^-/, '').split('.')[0].length
     const n = Number(s)
@@ -121,7 +113,6 @@ export function detect(raw: string): Detection[] {
     })
   }
 
-  // IDs
   if (UUID_RE.test(s)) {
     const hex = s.replace(/[^0-9a-f]/gi, '')
     out.push({
@@ -135,14 +126,11 @@ export function detect(raw: string): Detection[] {
     out.push({ tool: 'uuid', label: 'Inspect ULID', preview: 'ULID', confidence: 'medium', apply: open('uuid', { 'uuid:inspect': s }) })
   }
 
-  // numbers in other bases
   if (/^-?0x[0-9a-f_]+$/i.test(s) || /^0b[01_]+$/i.test(s) || /^0o[0-7_]+$/i.test(s)) {
     let preview = ''
     try {
       preview = `= ${BigInt(s.replace(/_/g, '')).toString()} (dec)`
-    } catch {
-      /* ignore */
-    }
+    } catch {}
     out.push({
       tool: 'base',
       label: 'Convert number',
@@ -160,7 +148,6 @@ export function detect(raw: string): Detection[] {
     })
   }
 
-  // regex literal
   const re = /^\/(.+)\/([dgimsuyv]*)$/s.exec(s)
   if (re) {
     out.push({
@@ -172,7 +159,6 @@ export function detect(raw: string): Detection[] {
     })
   }
 
-  // base64
   const compact = s.replace(/\s+/g, '')
   if (compact.length >= 8 && /^[A-Za-z0-9+/_-]+={0,2}$/.test(compact) && !/^\d+$/.test(compact) && !UUID_RE.test(s)) {
     try {
@@ -194,12 +180,9 @@ export function detect(raw: string): Detection[] {
           confidence: 'low',
           apply: open('base64', { 'base64:input': s, 'base64:mode': 'decode' }),
         })
-    } catch {
-      /* not base64 */
-    }
+    } catch {}
   }
 
-  // fallbacks
   // eslint-disable-next-line no-control-regex
   const odd = (s.match(/[^\x09\x0A\x0D\x20-\x7E]/g) ?? []).length
   out.push({
