@@ -2,6 +2,8 @@
 
 A private, 100% client-side dev toolbox / new-tab page. Dark terminal-green UI.
 
+Live at **https://toolbox.tjudd.dev**.
+
 **Tools:** JSON · JWT · URL · Base64 · Unicode inspector · Regex · Epoch · UUID · Base/Bits
 
 - `Ctrl K` / `/`: command palette. Paste anything (JWT, URL, epoch, JSON…) and it opens the right tool.
@@ -18,12 +20,20 @@ npm run dev
 npm run build   # → dist/
 ```
 
-## Deploy
+## Self-hosting
 
-Vercel (Vite preset), connected to this GitHub repo: every push to `main` deploys to production at https://toolbox.tjudd.dev, and other branches get preview deploys. Headers/CSP live in `vercel.json`.
+It's a static site: `npm run build` and serve `dist/` anywhere. `vercel.json` holds the security headers (strict CSP, no-referrer, etc.). On Vercel, import the repo with the Vite preset and they apply automatically; on other hosts, port those headers to your server config.
 
-## Adding a tool
+If you deploy your own copy, update the canonical/Open Graph URLs in `index.html` and `GITHUB_URL` in `src/App.tsx`.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md). Adding a tool in short:
 
 1. Create `src/tools/MyTool.tsx` (default export component).
 2. Register it in `src/tools/registry.ts`.
 3. Optional: teach `src/lib/detect.ts` to recognize its input for smart paste.
+
+## License
+
+[MIT](LICENSE)
