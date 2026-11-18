@@ -20,7 +20,7 @@ npm run build   # → dist/
 
 ## Deploy
 
-Vercel (Vite preset). Headers/CSP live in `vercel.json`.
+Vercel (Vite preset), connected to this GitHub repo: every push to `main` deploys to production at https://toolbox.tjudd.dev, and other branches get preview deploys. Headers/CSP live in `vercel.json`.
 
 ## Adding a tool
 
