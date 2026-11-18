@@ -14,9 +14,9 @@ const greenTheme = EditorView.theme(
     '.cm-content': { caretColor: 'var(--color-accent)', padding: '10px 0' },
     '.cm-line': { padding: '0 12px' },
     '.cm-cursor, .cm-dropCursor': { borderLeftColor: 'var(--color-accent)', borderLeftWidth: '2px' },
-    '&.cm-focused .cm-cursor': { boxShadow: '0 0 6px rgba(57,255,20,.8)' },
+    '&.cm-focused .cm-cursor': { boxShadow: '0 0 6px color-mix(in srgb, var(--color-accent) 80%, transparent)' },
     '.cm-selectionBackground, &.cm-focused .cm-selectionBackground, .cm-content ::selection': {
-      backgroundColor: 'rgba(57,255,20,.2) !important',
+      backgroundColor: 'color-mix(in srgb, var(--color-accent) 20%, transparent) !important',
     },
     '.cm-gutters': {
       backgroundColor: 'transparent',
@@ -26,7 +26,7 @@ const greenTheme = EditorView.theme(
     },
     '.cm-lineNumbers .cm-gutterElement': { padding: '0 8px 0 12px' },
     '.cm-activeLineGutter': { backgroundColor: 'transparent', color: 'var(--color-accent-soft)' },
-    '.cm-activeLine': { backgroundColor: 'rgba(57,255,20,.035)' },
+    '.cm-activeLine': { backgroundColor: 'color-mix(in srgb, var(--color-accent) 3.5%, transparent)' },
     '&.cm-focused': { outline: 'none' },
     '.cm-placeholder': { color: 'var(--color-faint)' },
     '.cm-foldPlaceholder': {
@@ -37,12 +37,12 @@ const greenTheme = EditorView.theme(
     },
     '.cm-foldGutter .cm-gutterElement': { color: 'var(--color-faint)' },
     '.cm-matchingBracket, &.cm-focused .cm-matchingBracket': {
-      backgroundColor: 'rgba(57,255,20,.14)',
-      outline: '1px solid rgba(57,255,20,.45)',
+      backgroundColor: 'color-mix(in srgb, var(--color-accent) 14%, transparent)',
+      outline: '1px solid color-mix(in srgb, var(--color-accent) 45%, transparent)',
     },
     '.cm-selectionMatch': { backgroundColor: 'rgba(92,225,255,.12)' },
     '.cm-searchMatch': { backgroundColor: 'rgba(255,209,102,.25)', outline: '1px solid rgba(255,209,102,.6)' },
-    '.cm-searchMatch.cm-searchMatch-selected': { backgroundColor: 'rgba(57,255,20,.35)' },
+    '.cm-searchMatch.cm-searchMatch-selected': { backgroundColor: 'color-mix(in srgb, var(--color-accent) 35%, transparent)' },
     '.cm-panels': { backgroundColor: 'var(--color-panel-2)', color: 'var(--color-fg)', borderColor: 'var(--color-line)' },
     '.cm-panels input, .cm-panels button': { fontFamily: 'var(--font-mono)' },
     '.cm-tooltip': { backgroundColor: 'var(--color-panel-2)', border: '1px solid var(--color-line-2)' },
@@ -51,14 +51,14 @@ const greenTheme = EditorView.theme(
 )
 
 const greenHighlight = HighlightStyle.define([
-  { tag: t.propertyName, color: '#5ce1ff' },
-  { tag: t.string, color: '#7dff9a' },
-  { tag: [t.number, t.integer, t.float], color: '#ffd166' },
-  { tag: [t.bool, t.null, t.atom], color: '#c49bff' },
-  { tag: [t.punctuation, t.separator, t.brace, t.squareBracket], color: '#5f8a6b' },
-  { tag: t.keyword, color: '#c49bff' },
-  { tag: t.comment, color: '#3d5c46', fontStyle: 'italic' },
-  { tag: t.invalid, color: '#ff5c7a' },
+  { tag: t.propertyName, color: 'var(--color-info)' },
+  { tag: t.string, color: 'var(--color-accent-soft)' },
+  { tag: [t.number, t.integer, t.float], color: 'var(--color-warn)' },
+  { tag: [t.bool, t.null, t.atom], color: 'var(--color-violet)' },
+  { tag: [t.punctuation, t.separator, t.brace, t.squareBracket], color: 'var(--color-dim)' },
+  { tag: t.keyword, color: 'var(--color-violet)' },
+  { tag: t.comment, color: 'var(--color-faint)', fontStyle: 'italic' },
+  { tag: t.invalid, color: 'var(--color-err)' },
 ])
 
 const baseTheme: Extension = [greenTheme, syntaxHighlighting(greenHighlight)]

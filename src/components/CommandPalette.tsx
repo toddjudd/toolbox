@@ -6,6 +6,7 @@ import { navigate } from '../lib/router'
 import { copy } from '../lib/format'
 import { setStored, getStored } from '../lib/store'
 import { uuidv4, uuidv7, ulid, nanoid } from '../lib/ids'
+import { PRESETS, openThemePicker } from '../lib/theme'
 import { cx } from './ui'
 
 type Item = {
@@ -46,6 +47,15 @@ function actions(): Item[] {
       run: () => setStored('ui:crt', !getStored('ui:crt', false)),
     },
     { key: 'a-home', group: 'Actions', glyph: '~', label: 'Go home', keywords: 'home start new tab', run: () => navigate('') },
+    { key: 'a-theme', group: 'Actions', glyph: '◐', label: 'Theme color…', keywords: 'theme color accent picker palette appearance', run: openThemePicker },
+    ...PRESETS.map((p) => ({
+      key: 'a-theme-' + p.name,
+      group: 'Actions',
+      glyph: '●',
+      label: `Theme: ${p.name}`,
+      keywords: `theme color accent ${p.name}`,
+      run: () => setStored('ui:accent', p.hex),
+    })),
   ]
 }
 
@@ -113,7 +123,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 px-4 pt-[12vh] backdrop-blur-[2px]" onMouseDown={onClose}>
       <div
-        className="w-full max-w-2xl overflow-hidden rounded-xl border border-line-2 bg-panel shadow-[0_0_0_1px_rgba(57,255,20,.15),0_30px_80px_-20px_rgba(0,0,0,.9),0_0_60px_-20px_rgba(57,255,20,.4)]"
+        className="w-full max-w-2xl overflow-hidden rounded-xl border border-line-2 bg-panel shadow-[0_0_0_1px_color-mix(in_srgb,var(--color-accent)_15%,transparent),0_30px_80px_-20px_rgba(0,0,0,.9),0_0_60px_-20px_color-mix(in_srgb,var(--color-accent)_40%,transparent)]"
         onMouseDown={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-3 border-b border-line px-4">

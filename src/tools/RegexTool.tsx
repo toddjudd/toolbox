@@ -100,7 +100,7 @@ export default function RegexTool() {
       <div
         className={cx(
           'flex flex-wrap items-center gap-2 rounded-xl border bg-panel p-2 pl-4 transition',
-          res && !res.ok ? 'border-err/60' : 'border-line-2 focus-within:border-accent focus-within:shadow-[0_0_0_3px_rgba(57,255,20,.1)]',
+          res && !res.ok ? 'border-err/60' : 'border-line-2 focus-within:border-accent focus-within:shadow-[0_0_0_3px_color-mix(in_srgb,var(--color-accent)_10%,transparent)]',
         )}
       >
         <span className="text-lg text-faint">/</span>

@@ -5,8 +5,12 @@ import { usePersistent } from './lib/store'
 import { useNow } from './lib/hooks'
 import { clockParts, copy } from './lib/format'
 import { CommandPalette } from './components/CommandPalette'
+import { ThemePicker } from './components/ThemePicker'
+import { DEFAULT_ACCENT, applyAccent } from './lib/theme'
 import { cx } from './components/ui'
 import Home from './Home'
+
+const GITHUB_URL = 'https://github.com/toddjudd'
 
 const isEditable = (el: EventTarget | null) =>
   el instanceof HTMLElement && (el.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) || !!el.closest('.cm-editor'))
@@ -16,11 +20,21 @@ export default function App() {
   const tool = toolById(route)
   const [paletteOpen, setPaletteOpen] = useState(false)
   const [navOpen, setNavOpen] = useState(false)
+  const [themeOpen, setThemeOpen] = useState(false)
   const [crt] = usePersistent('ui:crt', false)
+  const [accent] = usePersistent('ui:accent', DEFAULT_ACCENT)
 
   useEffect(() => {
     document.documentElement.classList.toggle('crt', crt)
   }, [crt])
+
+  useEffect(() => applyAccent(accent), [accent])
+
+  useEffect(() => {
+    const open = () => setThemeOpen(true)
+    window.addEventListener('tb:theme-picker', open)
+    return () => window.removeEventListener('tb:theme-picker', open)
+  }, [])
 
   useEffect(() => {
     document.title = tool ? `${tool.name} · ~/toolbox` : '~/toolbox'
@@ -56,8 +70,9 @@ export default function App() {
           </Suspense>
         </main>
       </div>
-      <StatusBar />
+      <StatusBar onTheme={() => setThemeOpen((o) => !o)} />
       {paletteOpen && <CommandPalette onClose={() => setPaletteOpen(false)} />}
+      {themeOpen && <ThemePicker onClose={() => setThemeOpen(false)} />}
     </div>
   )
 }
@@ -159,7 +174,7 @@ function ToolFrame({ tool }: { tool: Tool }) {
   )
 }
 
-function StatusBar() {
+function StatusBar({ onTheme }: { onTheme: () => void }) {
   const now = useNow(1000)
   const [crt, setCrt] = usePersistent('ui:crt', false)
   const local = clockParts(now)
@@ -172,6 +187,11 @@ function StatusBar() {
         <span className="hidden sm:inline">100% local · nothing leaves this tab</span>
         <span className="sm:hidden">local</span>
       </span>
+      <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className="text-faint transition hover:text-accent" title="GitHub" aria-label="GitHub">
+        <svg viewBox="0 0 16 16" width="13" height="13" fill="currentColor" aria-hidden>
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
+        </svg>
+      </a>
       <span className="flex-1" />
       <span className="hidden sm:inline">
         local <span className="text-dim">{`${local.h}:${local.m}:${local.s}`}</span>
@@ -184,6 +204,10 @@ function StatusBar() {
       </button>
       <button className={cx('hover:text-accent', crt && 'text-accent')} onClick={() => setCrt(!crt)} title="toggle CRT scanlines">
         crt
+      </button>
+      <button data-theme-trigger onClick={onTheme} className="flex items-center gap-1.5 hover:text-accent" title="theme color">
+        <span className="h-2.5 w-2.5 rounded-full bg-accent shadow-[0_0_6px_var(--color-accent)]" />
+        <span className="max-sm:hidden">theme</span>
       </button>
     </footer>
   )

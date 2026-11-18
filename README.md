@@ -7,6 +7,7 @@ A private, 100% client-side dev toolbox / new-tab page. Dark terminal-green UI.
 - `Ctrl K` / `/`: command palette. Paste anything (JWT, URL, epoch, JSON…) and it opens the right tool.
 - `Alt 1-9`: jump to a tool, `Alt 0` home.
 - Home: clock, search with bangs (`!gh !npm !mdn !so !ciu !claude`), smart paste, quick links, scratchpad.
+- Theme: every color derives from one `--accent` (OKLCH relative colors). Pick it from the footer swatch or `Ctrl K` → "theme".
 - State persists in `localStorage`. A strict CSP (`connect-src 'self'`) means pasted data can't be sent anywhere.
 
 ## Dev

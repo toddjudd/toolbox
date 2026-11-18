@@ -87,7 +87,7 @@ export default function Home({ onPalette }: { onPalette: () => void }) {
           location.href = target.url
         }}
       >
-        <div className="group flex h-12 items-center gap-3 rounded-xl border border-line-2 bg-panel px-4 transition focus-within:border-accent focus-within:shadow-[0_0_0_3px_rgba(57,255,20,.12),0_0_40px_-12px_rgba(57,255,20,.6)]">
+        <div className="group flex h-12 items-center gap-3 rounded-xl border border-line-2 bg-panel px-4 transition focus-within:border-accent focus-within:shadow-[0_0_0_3px_color-mix(in_srgb,var(--color-accent)_12%,transparent),0_0_40px_-12px_color-mix(in_srgb,var(--color-accent)_60%,transparent)]">
           <span className="glow text-accent">❯</span>
           <input
             ref={searchRef}
@@ -149,7 +149,7 @@ export default function Home({ onPalette }: { onPalette: () => void }) {
                 <a
                   key={t.id}
                   href={`#/${t.id}`}
-                  className="group flex flex-col gap-1.5 rounded-lg border border-line bg-panel/80 p-3 transition hover:-translate-y-px hover:border-accent/60 hover:shadow-[0_0_24px_-10px_rgba(57,255,20,.7)]"
+                  className="group flex flex-col gap-1.5 rounded-lg border border-line bg-panel/80 p-3 transition hover:-translate-y-px hover:border-accent/60 hover:shadow-[0_0_24px_-10px_color-mix(in_srgb,var(--color-accent)_70%,transparent)]"
                 >
                   <div className="flex items-center gap-2">
                     <span className="grid h-7 w-8 place-items-center rounded border border-line-2 text-[11px] text-dim transition group-hover:border-accent/60 group-hover:text-accent group-hover:glow">

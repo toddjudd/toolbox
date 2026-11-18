@@ -156,7 +156,7 @@ export default function Base64Tool() {
         >
           {imgUrl ? (
             <div className="flex h-full flex-col items-center justify-center gap-3 p-4">
-              <img src={imgUrl} alt="decoded" className="max-h-[70%] max-w-full rounded border border-line-2 bg-[repeating-conic-gradient(#0e1811_0_25%,#0a110c_0_50%)] bg-[length:16px_16px]" />
+              <img src={imgUrl} alt="decoded" className="max-h-[70%] max-w-full rounded border border-line-2 bg-[repeating-conic-gradient(var(--color-panel-2)_0_25%,var(--color-panel)_0_50%)] bg-[length:16px_16px]" />
               <a href={imgUrl} download={`decoded.${res.image!.split('/')[1].replace('+xml', '')}`} className="btn">
                 ⇩ download
               </a>

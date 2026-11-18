@@ -29,21 +29,31 @@ function emit(key: string) {
   listeners.get(key)?.forEach((l) => l())
 }
 
+function write(key: string) {
+  timers.delete(key)
+  try {
+    const raw = JSON.stringify(cache.get(key))
+    if (raw === undefined) localStorage.removeItem(PREFIX + key)
+    else if (raw.length < 2_000_000) localStorage.setItem(PREFIX + key, raw)
+  } catch {
+    /* quota exceeded: keep in memory only */
+  }
+}
+
 function persist(key: string) {
   clearTimeout(timers.get(key))
   timers.set(
     key,
-    setTimeout(() => {
-      timers.delete(key)
-      try {
-        const raw = JSON.stringify(cache.get(key))
-        if (raw === undefined) localStorage.removeItem(PREFIX + key)
-        else if (raw.length < 2_000_000) localStorage.setItem(PREFIX + key, raw)
-      } catch {
-        /* quota exceeded: keep in memory only */
-      }
-    }, 250),
+    setTimeout(() => write(key), 250),
   )
+}
+
+/** Writes debounced changes immediately, so nothing is lost when the tab closes or navigates. */
+export function flushStored() {
+  for (const [key, t] of timers) {
+    clearTimeout(t)
+    write(key)
+  }
 }
 
 export function setStored<T>(key: string, value: T) {
@@ -57,6 +67,8 @@ export function getStored<T>(key: string, fallback: T): T {
 }
 
 if (typeof window !== 'undefined') {
+  window.addEventListener('pagehide', flushStored)
+  document.addEventListener('visibilitychange', () => document.visibilityState === 'hidden' && flushStored())
   window.addEventListener('storage', (e) => {
     if (!e.key?.startsWith(PREFIX)) return
     const key = e.key.slice(PREFIX.length)
