@@ -178,15 +178,17 @@ function analyze(text: string) {
     out.push({ i, cp, ch, cat, script: script(ch), flag: classify(cp, cat.code) })
     i += ch.length
   }
-  // homoglyph check: Latin mixed with look-alike scripts
-  const letterScripts = new Set(out.filter((x) => x.cat.code.startsWith('L')).map((x) => x.script))
+  return { chars: out, mixed: flagHomoglyphs(out) }
+}
+
+function flagHomoglyphs(chars: Info[]) {
+  const letterScripts = new Set(chars.filter((x) => x.cat.code.startsWith('L')).map((x) => x.script))
   const confusable = ['Cyrillic', 'Greek', 'Armenian', 'Cherokee'].filter((s) => letterScripts.has(s))
-  if (letterScripts.has('Latin') && confusable.length) {
-    for (const x of out)
-      if (!x.flag && confusable.includes(x.script) && x.cat.code.startsWith('L'))
-        x.flag = { sev: 'warn', why: `${x.script} letter mixed into Latin text: possible homoglyph` }
-  }
-  return { chars: out, mixed: letterScripts.has('Latin') && confusable.length ? confusable : [] }
+  if (!letterScripts.has('Latin') || !confusable.length) return []
+  for (const x of chars)
+    if (!x.flag && confusable.includes(x.script) && x.cat.code.startsWith('L'))
+      x.flag = { sev: 'warn', why: `${x.script} letter mixed into Latin text: possible homoglyph` }
+  return confusable
 }
 
 const hexcp = (cp: number) => 'U+' + cp.toString(16).toUpperCase().padStart(4, '0')

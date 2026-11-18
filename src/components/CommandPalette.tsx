@@ -79,7 +79,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
     const acts = actions()
     if (!query) return [...toolItems, ...acts]
 
-    const score = (i: Item) => Math.max(fuzzy(query, i.label) * 2, fuzzy(query, i.keywords ?? '') )
+    const score = (i: Item) => Math.max((fuzzy(query, i.label) ?? 0) * 2, fuzzy(query, i.keywords ?? '') ?? 0)
     const rank = (list: Item[]) =>
       list
         .map((i) => [i, score(i)] as const)
@@ -89,7 +89,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
 
     const matchedTools = rank(toolItems)
     const matchedActs = rank(acts)
-    const looksLikeData = query.length > 12 || /[^a-z0-9 \-]/i.test(query) || /^\d+$/.test(query)
+    const looksLikeData = query.length > 12 || /[^a-z0-9 -]/i.test(query) || /^\d+$/.test(query)
     const dets = detect(q)
       .filter((d) => d.confidence !== 'low' || (looksLikeData && !matchedTools.length))
       .filter((d) => looksLikeData || d.confidence === 'high')

@@ -20,7 +20,6 @@ const clip = (s: string, n = 70) => (s.length > n ? s.slice(0, n) + '…' : s).r
 const UUID_RE = /^[{(]?[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}[)}]?$/i
 const ULID_RE = /^[0-9A-HJKMNP-TV-Z]{26}$/i
 
-/** Figures out what a blob of pasted text probably is, best guesses first. */
 export function detect(raw: string): Detection[] {
   const s = raw.trim()
   const out: Detection[] = []
@@ -183,8 +182,7 @@ export function detect(raw: string): Detection[] {
     } catch {}
   }
 
-  // eslint-disable-next-line no-control-regex
-  const odd = (s.match(/[^\x09\x0A\x0D\x20-\x7E]/g) ?? []).length
+  const odd = (s.match(/[^\t\n\r -~]/g) ?? []).length
   out.push({
     tool: 'unicode',
     label: 'Inspect characters',

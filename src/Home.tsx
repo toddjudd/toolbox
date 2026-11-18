@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, type ClipboardEvent as ReactClipboardEvent } from 'react'
 import { TOOLS } from './tools/registry'
 import { detect } from './lib/detect'
 import { usePersistent } from './lib/store'
@@ -64,6 +64,14 @@ export default function Home({ onPalette }: { onPalette: () => void }) {
     searchRef.current?.focus()
   }, [])
 
+  const jumpToDetectedTool = (e: ReactClipboardEvent<HTMLInputElement>) => {
+    const d = detect(e.clipboardData.getData('text'))[0]
+    if (!q && d?.confidence === 'high' && d.tool !== 'url') {
+      e.preventDefault()
+      d.apply()
+    }
+  }
+
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-8 sm:px-6 sm:py-12">
       <section className="flex flex-col items-center gap-2 text-center">
@@ -93,15 +101,7 @@ export default function Home({ onPalette }: { onPalette: () => void }) {
             ref={searchRef}
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            onPaste={(e) => {
-              // pasting data (JWT, JSON, epoch…) into the search box jumps straight to the right tool
-              const t = e.clipboardData.getData('text')
-              const d = detect(t)[0]
-              if (!q && d?.confidence === 'high' && d.tool !== 'url') {
-                e.preventDefault()
-                d.apply()
-              }
-            }}
+            onPaste={jumpToDetectedTool}
             onKeyDown={(e) => {
               if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && target) {
                 e.preventDefault()

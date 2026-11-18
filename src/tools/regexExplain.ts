@@ -19,7 +19,14 @@ const ESC: Record<string, string> = {
 
 const SPECIAL = '\\[](){}*+?^$.|'
 
-/** Very small regex tokenizer that explains a pattern in plain English. */
+function literalRunEnd(p: string, start: number) {
+  let end = start
+  while (end < p.length && !SPECIAL.includes(p[end])) end++
+  if (end === start) return start + 1
+  const quantifierFollows = '*+?{'.includes(p[end] ?? '')
+  return quantifierFollows && end - start > 1 ? end - 1 : end
+}
+
 export function explain(p: string): Token[] {
   const out: Token[] = []
   let i = 0
@@ -150,11 +157,7 @@ export function explain(p: string): Token[] {
       i++
       continue
     }
-    // literal run; leave the last char alone if a quantifier follows it
-    let j = i
-    while (j < p.length && !SPECIAL.includes(p[j])) j++
-    if (j === i) j = i + 1
-    if (j - i > 1 && '*+?{'.includes(p[j] ?? '')) j--
+    const j = literalRunEnd(p, i)
     push(p.slice(i, j), `literal “${p.slice(i, j)}”`, 'literal')
     i = j
   }

@@ -149,7 +149,6 @@ export function Empty({ children }: { children: ReactNode }) {
   return <div className="flex h-full min-h-24 items-center justify-center p-6 text-center text-xs text-faint">{children}</div>
 }
 
-/** Read-only key/value row with a copy affordance. */
 export function KV({ k, v, mono = true, hint }: { k: ReactNode; v: string; mono?: boolean; hint?: ReactNode }) {
   const [done, setDone] = useState(false)
   return (

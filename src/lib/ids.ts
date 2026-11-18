@@ -11,7 +11,7 @@ export function uuidv4() {
 
 let lastMs = 0
 let seq = 0
-/** RFC 9562 UUIDv7, monotonic within the same millisecond via a 12-bit counter. */
+const SEQ_RANDOM_START_MASK = 0x07
 export function uuidv7() {
   const b = crypto.getRandomValues(new Uint8Array(16))
   let ms = Date.now()
@@ -24,7 +24,7 @@ export function uuidv7() {
     ms = lastMs
   } else {
     lastMs = ms
-    seq = b[6] & 0x07 // random start, leaves headroom
+    seq = b[6] & SEQ_RANDOM_START_MASK
   }
   const t = BigInt(ms)
   for (let i = 0; i < 6; i++) b[i] = Number((t >> BigInt(8 * (5 - i))) & 0xffn)

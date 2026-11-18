@@ -167,7 +167,8 @@ function DurationCalc() {
     r -= hh * 3600
     const mm = Math.floor(r / 60)
     const ss = r - mm * 60
-    return `P${dd ? dd + 'D' : ''}${hh || mm || ss ? 'T' : ''}${hh ? hh + 'H' : ''}${mm ? mm + 'M' : ''}${ss ? ss + 'S' : ''}` || 'PT0S'
+    if (!dd && !hh && !mm && !ss) return 'PT0S'
+    return `P${dd ? dd + 'D' : ''}${hh || mm || ss ? 'T' : ''}${hh ? hh + 'H' : ''}${mm ? mm + 'M' : ''}${ss ? ss + 'S' : ''}`
   })()
   return (
     <Pane title="duration / TTL" actions={<Seg value={u} onChange={setU} options={['ms', 's', 'm', 'h'] as const} />}>

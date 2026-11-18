@@ -72,7 +72,6 @@ const mark = (cls: string) => {
 
 export type MarkRange = { from: number; to: number; cls: string }
 
-/** Highlights arbitrary (non-overlapping or nested-sorted) ranges. Clamped to doc length. */
 export function markRanges(ranges: MarkRange[]): Extension {
   const sorted = [...ranges].sort((a, b) => a.from - b.from || b.to - a.to)
   return EditorView.decorations.of((view) => {

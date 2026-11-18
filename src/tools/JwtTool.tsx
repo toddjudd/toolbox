@@ -131,7 +131,7 @@ const PART_CLS = ['cm-jwt-h', 'cm-jwt-p', 'cm-jwt-s']
 
 export default function JwtTool() {
   const [token, setToken] = usePersistent('jwt:input', '')
-  const [key, setKey] = useState('') // never persisted
+  const [key, setKey] = useState('')
   const [keyB64, setKeyB64] = useState(false)
   const [ver, setVer] = useState<{ state: 'idle' | 'ok' | 'bad' | 'err'; msg?: string }>({ state: 'idle' })
   const now = useNow(1000)

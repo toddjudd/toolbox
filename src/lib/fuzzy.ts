@@ -1,5 +1,4 @@
-/** Simple subsequence fuzzy score. Higher is better, -1 = no match. */
-export function fuzzy(query: string, text: string): number {
+export function fuzzy(query: string, text: string): number | null {
   const q = query.toLowerCase().trim()
   const t = text.toLowerCase()
   if (!q) return 0
@@ -11,7 +10,7 @@ export function fuzzy(query: string, text: string): number {
   for (const ch of q) {
     if (ch === ' ') continue
     const found = t.indexOf(ch, ti)
-    if (found === -1) return -1
+    if (found === -1) return null
     streak = found === ti ? streak + 1 : 0
     score += 10 + streak * 5 - Math.min(found - ti, 10)
     ti = found + 1

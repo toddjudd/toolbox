@@ -4,7 +4,6 @@
 @theme {
   --font-mono: 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --font-sans: var(--font-mono);
-  /* every shade below derives from --accent (set at runtime by the theme picker) */
   --color-bg: oklch(from var(--accent) 0.125 calc(c * 0.06) h);
   --color-panel: oklch(from var(--accent) 0.16 calc(c * 0.07) h);
   --color-panel-2: oklch(from var(--accent) 0.185 calc(c * 0.08) h);
@@ -13,7 +12,6 @@
   --color-fg: oklch(from var(--accent) 0.93 calc(c * 0.28) h);
   --color-dim: oklch(from var(--accent) 0.66 calc(c * 0.3) h);
   --color-faint: oklch(from var(--accent) 0.46 calc(c * 0.22) h);
-  /* clamp lightness so dark picks stay readable on the dark background */
   --color-accent: oklch(from var(--accent) clamp(0.72, l, 0.95) c h);
   --color-accent-soft: oklch(from var(--accent) 0.88 calc(c * 0.6) h);
   --color-warn: #ffd166;

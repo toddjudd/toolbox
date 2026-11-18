@@ -32,14 +32,13 @@ export default function BaseTool() {
   const w = BigInt(width)
   const mask = (1n << w) - 1n
   const val = typeof v === 'bigint' ? v : null
-  // representation for non-decimal bases: two's complement when negative
-  const unsigned = val == null ? null : val < 0n ? val & mask : val
+  const bitPattern = val == null ? null : val < 0n ? val & mask : val
 
   const show = (r: Radix) => {
     if (src.radix === r) return src.text
     if (val == null) return ''
     if (r === 'd') return val.toString(10)
-    return unsigned!.toString(RADIX[r].base)
+    return bitPattern!.toString(RADIX[r].base)
   }
 
   return (
@@ -117,7 +116,7 @@ export default function BaseTool() {
         title="bits · click to flip"
         actions={
           <>
-            <span className="text-[11px] text-faint">{unsigned != null ? `${unsigned.toString(2).replace(/^0+/, '').length || 0} significant bits · popcount ${(unsigned & mask).toString(2).split('1').length - 1}` : ''}</span>
+            <span className="text-[11px] text-faint">{bitPattern != null ? `${bitPattern.toString(2).replace(/^0+/, '').length || 0} significant bits · popcount ${(bitPattern & mask).toString(2).split('1').length - 1}` : ''}</span>
             <Seg value={width} onChange={setWidth} options={WIDTHS.map((x) => ({ value: x, label: `${x}` }))} />
           </>
         }
@@ -130,13 +129,13 @@ export default function BaseTool() {
                 <div className="flex gap-0.5">
                   {Array.from({ length: 8 }, (_, bit) => {
                     const idx = BigInt(hi * 8 + (7 - bit))
-                    const on = unsigned != null && ((unsigned >> idx) & 1n) === 1n
+                    const on = bitPattern != null && ((bitPattern >> idx) & 1n) === 1n
                     return (
                       <button
                         key={bit}
                         title={`bit ${idx} = ${1n << idx}`}
                         onClick={() => {
-                          const cur = unsigned ?? 0n
+                          const cur = bitPattern ?? 0n
                           const next = (cur ^ (1n << idx)) & mask
                           setSrc({ radix: 'd', text: next.toString() })
                         }}
@@ -151,7 +150,7 @@ export default function BaseTool() {
                   })}
                 </div>
                 <span className="text-[10px] text-faint">
-                  {hi * 8 + 7}…{hi * 8} · 0x{unsigned != null ? ((unsigned >> BigInt(hi * 8)) & 0xffn).toString(16).padStart(2, '0') : '00'}
+                  {hi * 8 + 7}…{hi * 8} · 0x{bitPattern != null ? ((bitPattern >> BigInt(hi * 8)) & 0xffn).toString(16).padStart(2, '0') : '00'}
                 </span>
               </div>
             )

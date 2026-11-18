@@ -9,7 +9,6 @@ function subscribe(cb: () => void) {
   return () => window.removeEventListener('hashchange', cb)
 }
 
-/** Current route id, e.g. "" for home or "json" for #/json */
 export function useRoute() {
   return useSyncExternalStore(subscribe, current)
 }

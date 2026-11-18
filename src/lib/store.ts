@@ -1,12 +1,5 @@
 import { useCallback, useSyncExternalStore } from 'react'
 
-/**
- * Tiny persistent store backed by localStorage.
- * - Reads are cached in memory, writes to disk are debounced.
- * - Any component (or the command palette) can set a key and every subscriber updates.
- * - Syncs across open tabs via the `storage` event.
- */
-
 const PREFIX = 'tb:'
 const cache = new Map<string, unknown>()
 const listeners = new Map<string, Set<() => void>>()
@@ -18,9 +11,7 @@ function load<T>(key: string, fallback: T): T {
   try {
     const raw = localStorage.getItem(PREFIX + key)
     if (raw != null) value = JSON.parse(raw) as T
-  } catch {
-    /* storage unavailable or corrupt: use fallback */
-  }
+  } catch {}
   cache.set(key, value)
   return value
 }
@@ -35,9 +26,7 @@ function write(key: string) {
     const raw = JSON.stringify(cache.get(key))
     if (raw === undefined) localStorage.removeItem(PREFIX + key)
     else if (raw.length < 2_000_000) localStorage.setItem(PREFIX + key, raw)
-  } catch {
-    /* quota exceeded: keep in memory only */
-  }
+  } catch {}
 }
 
 function persist(key: string) {
@@ -48,7 +37,6 @@ function persist(key: string) {
   )
 }
 
-/** Writes debounced changes immediately, so nothing is lost when the tab closes or navigates. */
 export function flushStored() {
   for (const [key, t] of timers) {
     clearTimeout(t)
@@ -106,8 +94,7 @@ export function usePersistent<T>(key: string, fallback: T) {
       const prev = load(key, fallback)
       setStored(key, typeof next === 'function' ? (next as (p: T) => T)(prev) : next)
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [key],
+    [key, fallback],
   )
   return [value, update] as const
 }

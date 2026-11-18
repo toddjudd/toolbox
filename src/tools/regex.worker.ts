@@ -1,5 +1,4 @@
 /// <reference lib="webworker" />
-// Runs regexes off the main thread so catastrophic backtracking can't freeze the page.
 
 export type RegexReq = { id: number; pattern: string; flags: string; text: string; replace: string | null }
 export type Match = { index: number; end: number; text: string; groups: (string | undefined)[]; named: Record<string, string | undefined> | null }
@@ -9,7 +8,6 @@ export type RegexRes =
 
 const MAX = 5000
 
-/** Name (or "") of each capture group, in order. */
 function captureNames(p: string) {
   const names: string[] = []
   let inClass = false

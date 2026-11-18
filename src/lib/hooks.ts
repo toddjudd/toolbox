@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 
-/** Current time in ms, re-rendering on (roughly) aligned ticks. */
 export function useNow(interval = 1000) {
   const [now, setNow] = useState(() => Date.now())
   useEffect(() => {

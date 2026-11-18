@@ -25,7 +25,6 @@ export function bytesToB64(bytes: Uint8Array, urlSafe = false) {
   return urlSafe ? b.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '') : b
 }
 
-/** Decodes standard or URL-safe base64, padding optional, whitespace ignored. */
 export function b64ToBytes(input: string): Uint8Array<ArrayBuffer> {
   let s = input.replace(/\s+/g, '').replace(/-/g, '+').replace(/_/g, '/').replace(/=+$/, '')
   if (!/^[A-Za-z0-9+/]*$/.test(s)) throw new Error('Invalid base64 characters')
@@ -45,9 +44,16 @@ export function utf8Strict(bytes: Uint8Array): string | null {
   }
 }
 
-/** True when text is mostly human-readable (no stray control chars). */
+const ALLOWED_WHITESPACE = new Set([0x09, 0x0a, 0x0d])
+const REPLACEMENT_CHAR = 0xfffd
+
 export function isPrintable(s: string) {
-  return !/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F�]/.test(s)
+  for (const ch of s) {
+    const cp = ch.codePointAt(0)!
+    const isControl = cp < 0x20 || cp === 0x7f
+    if ((isControl && !ALLOWED_WHITESPACE.has(cp)) || cp === REPLACEMENT_CHAR) return false
+  }
+  return true
 }
 
 export function toHex(bytes: Uint8Array, sep = ' ') {
@@ -108,7 +114,6 @@ export function relTime(target: number, now: number) {
 
 const pad = (n: number, w = 2) => String(n).padStart(w, '0')
 
-/** "YYYY-MM-DD HH:mm:ss" + offset label in a given IANA zone (or local when undefined). */
 export function fmtInZone(ms: number, timeZone?: string) {
   const f = new Intl.DateTimeFormat('en-US', {
     timeZone,

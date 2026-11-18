@@ -37,14 +37,14 @@ DEBUG=true`
 type Saved = { name: string; pattern: string; flags: string }
 
 let workerSeq = 0
-function useRegexWorker(req: Omit<RegexReq, 'id'>) {
+function useRegexWorker(pattern: string, flags: string, text: string, replace: string | null) {
   const [res, setRes] = useState<RegexRes | { ok: false; error: string; timeout: true } | null>(null)
   const workerRef = useRef<Worker | null>(null)
 
   useEffect(() => () => workerRef.current?.terminate(), [])
 
   useEffect(() => {
-    if (!req.pattern) {
+    if (!pattern) {
       setRes(null)
       return
     }
@@ -63,14 +63,13 @@ function useRegexWorker(req: Omit<RegexReq, 'id'>) {
         clearTimeout(timer)
         setRes(e.data)
       }
-      w.postMessage({ ...req, id } satisfies RegexReq)
+      w.postMessage({ id, pattern, flags, text, replace } satisfies RegexReq)
     }, 90)
     return () => {
       clearTimeout(debounce)
       clearTimeout(timer)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [req.pattern, req.flags, req.text, req.replace])
+  }, [pattern, flags, text, replace])
 
   return res
 }
@@ -83,7 +82,7 @@ export default function RegexTool() {
   const [tab, setTab] = usePersistent<'matches' | 'replace' | 'explain' | 'library'>('regex:tab', 'matches')
   const [saved, setSaved] = usePersistent<Saved[]>('regex:saved', [])
 
-  const res = useRegexWorker({ pattern, flags, text, replace: tab === 'replace' ? replace : null })
+  const res = useRegexWorker(pattern, flags, text, tab === 'replace' ? replace : null)
   const ok = res?.ok ? res : null
 
   const marks = useMemo(
