@@ -1,6 +1,7 @@
 import { navigate } from './router'
 import { setStored } from './store'
 import { b64ToBytes, dec, isPrintable, relTime, utf8Strict } from './format'
+import { NUM_UNITS, fmtShort, headline, parseDuration } from './duration'
 
 export type Detection = {
   tool: string
@@ -109,6 +110,18 @@ export function detect(raw: string): Detection[] {
       preview: `${Math.floor(Date.parse(s) / 1000)} · ${relTime(Date.parse(s), now)}`,
       confidence: 'high',
       apply: open('epoch', { 'epoch:input': s }),
+    })
+  }
+
+  const dur = s.length <= 80 ? parseDuration(s) : null
+  if (dur && 'ns' in dur && Number.isFinite(dur.ns)) {
+    const unit = dur.kind === 'number' ? NUM_UNITS.find((u) => u.id === dur.unit)! : null
+    out.push({
+      tool: 'duration',
+      label: unit ? `Duration (as ${unit.long}?)` : 'Convert duration',
+      preview: unit ? `${s} ${unit.label} = ${headline(dur.ns).text}` : `${fmtShort(dur.ns)} · ${headline(dur.ns).text}`,
+      confidence: dur.kind === 'units' || dur.kind === 'iso' ? 'high' : 'medium',
+      apply: open('duration', { 'duration:input': s, 'duration:unit': 'auto' }),
     })
   }
 

@@ -156,7 +156,7 @@ export default function Home({ onPalette }: { onPalette: () => void }) {
                       {t.glyph}
                     </span>
                     <span className="flex-1 text-[13px] text-fg group-hover:text-accent">{t.name}</span>
-                    <span className="text-[10px] text-faint">alt {i + 1}</span>
+                    {i < 9 && <span className="text-[10px] text-faint">alt {i + 1}</span>}
                   </div>
                   <span className="text-[11px] leading-snug text-faint">{t.desc}</span>
                 </a>
@@ -204,7 +204,7 @@ function SmartPaste() {
         onChange={(e) => setText(e.target.value)}
         rows={2}
         spellCheck={false}
-        placeholder="paste a JWT, URL, JSON, timestamp, UUID, base64, 0xFF… and I'll open the right tool"
+        placeholder="paste a JWT, URL, JSON, timestamp, duration, UUID, base64, 0xFF… and I'll open the right tool"
         className="w-full resize-none bg-transparent text-[12.5px] text-fg outline-none placeholder:text-faint"
       />
       {text.trim() && (

@@ -12,6 +12,8 @@ import Home from './Home'
 
 const GITHUB_URL = 'https://github.com/toddjudd/toolbox'
 
+const altKey = (i: number) => (i < 9 ? String(i + 1) : '')
+
 const isEditable = (el: EventTarget | null) =>
   el instanceof HTMLElement && (el.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) || !!el.closest('.cm-editor'))
 
@@ -118,7 +120,7 @@ function Sidebar({ current, open, onClose }: { current: string; open: boolean; o
           const pinned = pins.includes(t.id)
           return (
             <div key={t.id} className="group relative">
-              <NavLink active={current === t.id} glyph={t.glyph} label={t.name} href={`#/${t.id}`} kbd={String(TOOLS.indexOf(t) + 1)} />
+              <NavLink active={current === t.id} glyph={t.glyph} label={t.name} href={`#/${t.id}`} kbd={altKey(TOOLS.indexOf(t))} />
               <button
                 onClick={() => setPins((p) => (pinned ? p.filter((x) => x !== t.id) : [...p, t.id]))}
                 className={cx(

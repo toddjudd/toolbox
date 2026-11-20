@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Badge, Btn, CopyBtn, KV, Pane, Seg } from '../components/ui'
 import { usePersistent } from '../lib/store'
 import { useNow } from '../lib/hooks'
-import { fmtDuration, fmtInZone, relTime } from '../lib/format'
+import { fmtInZone, relTime } from '../lib/format'
 
 type Unit = 'auto' | 's' | 'ms' | 'us' | 'ns'
 const UNIT_LABEL: Record<string, string> = { s: 'seconds', ms: 'milliseconds', us: 'microseconds', ns: 'nanoseconds', date: 'date string' }
@@ -148,44 +148,13 @@ export default function EpochTool() {
         </Pane>
       </div>
 
-      <DurationCalc />
+      <a
+        href="#/duration"
+        className="flex items-center gap-2 self-start rounded-md border border-dashed border-line-2 px-3 py-2 text-[12px] text-dim transition hover:border-accent/60 hover:text-accent"
+      >
+        <span className="text-accent/70">Δt</span>
+        converting a TTL or timeout like 600000 or 3600? → Duration tool
+      </a>
     </div>
-  )
-}
-
-function DurationCalc() {
-  const [val, setVal] = usePersistent('epoch:dur', '86400')
-  const [u, setU] = usePersistent<'s' | 'ms' | 'm' | 'h'>('epoch:durunit', 's')
-  const n = Number(val)
-  const ms = isNaN(n) ? NaN : n * { s: 1000, ms: 1, m: 60000, h: 3600000 }[u]
-  const iso = (() => {
-    if (isNaN(ms)) return ''
-    let r = Math.floor(ms / 1000)
-    const dd = Math.floor(r / 86400)
-    r -= dd * 86400
-    const hh = Math.floor(r / 3600)
-    r -= hh * 3600
-    const mm = Math.floor(r / 60)
-    const ss = r - mm * 60
-    if (!dd && !hh && !mm && !ss) return 'PT0S'
-    return `P${dd ? dd + 'D' : ''}${hh || mm || ss ? 'T' : ''}${hh ? hh + 'H' : ''}${mm ? mm + 'M' : ''}${ss ? ss + 'S' : ''}`
-  })()
-  return (
-    <Pane title="duration / TTL" actions={<Seg value={u} onChange={setU} options={['ms', 's', 'm', 'h'] as const} />}>
-      <div className="grid gap-3 p-3 sm:grid-cols-[14rem_1fr] sm:items-center">
-        <input className="input" value={val} onChange={(e) => setVal(e.target.value)} placeholder="3600" spellCheck={false} />
-        {isNaN(ms) ? (
-          <span className="text-[12px] text-err">not a number</span>
-        ) : (
-          <div className="flex flex-wrap gap-x-5 gap-y-1 text-[12px]">
-            <span className="text-accent">{fmtDuration(ms, 5)}</span>
-            <span className="text-dim">{(ms / 1000).toLocaleString()} s</span>
-            <span className="text-dim">{(ms / 3600000).toLocaleString(undefined, { maximumFractionDigits: 4 })} h</span>
-            <span className="text-dim">{(ms / 86400000).toLocaleString(undefined, { maximumFractionDigits: 4 })} d</span>
-            <span className="text-info">{iso}</span>
-          </div>
-        )}
-      </div>
-    </Pane>
   )
 }
