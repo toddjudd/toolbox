@@ -149,14 +149,14 @@ export function Empty({ children }: { children: ReactNode }) {
   return <div className="flex h-full min-h-24 items-center justify-center p-6 text-center text-xs text-faint">{children}</div>
 }
 
-export function KV({ k, v, mono = true, hint }: { k: ReactNode; v: string; mono?: boolean; hint?: ReactNode }) {
+export function KV({ k, v, mono = true, hint, copyText }: { k: ReactNode; v: string; mono?: boolean; hint?: ReactNode; copyText?: string }) {
   const [done, setDone] = useState(false)
   return (
     <button
       type="button"
       className="kv group"
       onClick={async () => {
-        await copy(v)
+        await copy(copyText ?? v)
         setDone(true)
         setTimeout(() => setDone(false), 900)
       }}

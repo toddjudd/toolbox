@@ -63,7 +63,7 @@ export const TOOLS: Tool[] = [
     name: 'Epoch',
     glyph: '◷',
     desc: 'Unix timestamps ↔ dates across time zones',
-    keywords: 'epoch unix timestamp time date timezone iso 8601 utc convert duration',
+    keywords: 'epoch unix timestamp time date timezone iso 8601 utc convert',
     Component: lazy(() => import('./EpochTool')),
   },
   {
@@ -81,6 +81,14 @@ export const TOOLS: Tool[] = [
     desc: 'Number bases, bit flipping, bytes ↔ text',
     keywords: 'hex binary decimal octal base convert bits bytes radix twos complement',
     Component: lazy(() => import('./BaseTool')),
+  },
+  {
+    id: 'duration',
+    name: 'Duration',
+    glyph: 'Δt',
+    desc: 'How long is 600000? ms/s/ns → human time, TTLs, ISO 8601',
+    keywords: 'duration time span length ttl timeout interval elapsed milliseconds seconds nanoseconds minutes hours days human readable iso 8601 go timespan convert how long',
+    Component: lazy(() => import('./DurationTool')),
   },
 ]
 

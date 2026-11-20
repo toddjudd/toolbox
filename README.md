@@ -4,7 +4,7 @@ A private, 100% client-side dev toolbox / new-tab page. Dark terminal-green UI.
 
 Live at **https://toolbox.tjudd.dev**.
 
-**Tools:** JSON · JWT · URL · Base64 · Unicode inspector · Regex · Epoch · UUID · Base/Bits
+**Tools:** JSON · JWT · URL · Base64 · Unicode inspector · Regex · Epoch · UUID · Base/Bits · Duration
 
 - `Ctrl K` / `/`: command palette. Paste anything (JWT, URL, epoch, JSON…) and it opens the right tool.
 - `Alt 1-9`: jump to a tool, `Alt 0` home.
