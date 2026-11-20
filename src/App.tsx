@@ -1,5 +1,6 @@
 import { Suspense, useEffect, useState } from 'react'
-import { TOOLS, toolById, type Tool } from './tools/registry'
+import { toolById, type Tool } from './tools/registry'
+import { SHORTCUT_SLOTS, orderedTools, shortcutLabel, useDragReorder, useToolOrder } from './tools/order'
 import { navigate, useRoute } from './lib/router'
 import { usePersistent } from './lib/store'
 import { useNow } from './lib/hooks'
@@ -11,8 +12,6 @@ import { cx } from './components/ui'
 import Home from './Home'
 
 const GITHUB_URL = 'https://github.com/toddjudd/toolbox'
-
-const altKey = (i: number) => (i < 9 ? String(i + 1) : '')
 
 const isEditable = (el: EventTarget | null) =>
   el instanceof HTMLElement && (el.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) || !!el.closest('.cm-editor'))
@@ -51,10 +50,19 @@ export default function App() {
       } else if (e.key === '/' && !isEditable(e.target)) {
         e.preventDefault()
         setPaletteOpen(true)
-      } else if (e.altKey && /^[0-9]$/.test(e.key)) {
+      } else if (e.altKey && !e.ctrlKey && !e.metaKey && /^Digit[0-9]$/.test(e.code)) {
+        // e.code, not e.key: Shift turns "1" into "!" and macOS Option produces symbols
+        const n = Number(e.code.slice(5))
+        if (n === 0) {
+          if (e.shiftKey) return
+          e.preventDefault()
+          navigate('')
+          return
+        }
+        const slot = (e.shiftKey ? 9 : 0) + n - 1
+        const target = slot < SHORTCUT_SLOTS ? orderedTools()[slot] : undefined
         e.preventDefault()
-        const n = Number(e.key)
-        navigate(n === 0 ? '' : (TOOLS[n - 1]?.id ?? ''))
+        if (target) navigate(target.id)
       }
     }
     window.addEventListener('keydown', onKey, true)
@@ -103,8 +111,8 @@ function TopBar({ onPalette, onMenu }: { onPalette: () => void; onMenu: () => vo
 }
 
 function Sidebar({ current, open, onClose }: { current: string; open: boolean; onClose: () => void }) {
-  const [pins, setPins] = usePersistent<string[]>('ui:pins', ['json', 'jwt'])
-  const ordered = [...TOOLS].sort((a, b) => Number(pins.includes(b.id)) - Number(pins.includes(a.id)))
+  const { tools, pins, move, togglePin } = useToolOrder()
+  const { dragId, dropIndex, itemProps } = useDragReorder(move)
   return (
     <>
       {open && <div className="fixed inset-0 z-30 bg-black/60 md:hidden" onClick={onClose} />}
@@ -116,13 +124,15 @@ function Sidebar({ current, open, onClose }: { current: string; open: boolean; o
       >
         <NavLink active={current === ''} glyph="~" label="home" href="#/" kbd="0" />
         <div className="label mt-3 mb-1 px-2 text-[10px]">tools</div>
-        {ordered.map((t) => {
+        {tools.map((t, i) => {
           const pinned = pins.includes(t.id)
           return (
-            <div key={t.id} className="group relative">
-              <NavLink active={current === t.id} glyph={t.glyph} label={t.name} href={`#/${t.id}`} kbd={altKey(TOOLS.indexOf(t))} />
+            <div key={t.id} {...itemProps(t.id, i)} className={cx('group relative', dragId === t.id && 'opacity-40')}>
+              {dropIndex === i && dragId && <DropLine edge="top" />}
+              {dropIndex === i + 1 && i === tools.length - 1 && dragId && <DropLine edge="bottom" />}
+              <NavLink active={current === t.id} glyph={t.glyph} label={t.name} href={`#/${t.id}`} kbd={shortcutLabel(i)} />
               <button
-                onClick={() => setPins((p) => (pinned ? p.filter((x) => x !== t.id) : [...p, t.id]))}
+                onClick={() => togglePin(t.id)}
                 className={cx(
                   'absolute top-1/2 right-8 -translate-y-1/2 px-1 text-[11px]',
                   pinned ? 'text-accent/80' : 'text-faint opacity-0 group-hover:opacity-100',
@@ -137,10 +147,25 @@ function Sidebar({ current, open, onClose }: { current: string; open: boolean; o
         <div className="mt-auto px-2 pt-6 pb-1 text-[10.5px] leading-relaxed text-faint">
           <span className="kbd">Alt</span>+<span className="kbd">1-9</span> jump
           <br />
+          <span className="kbd">Alt</span>+<span className="kbd">Shift</span>+<span className="kbd">1-9</span> 10+
+          <br />
           <span className="kbd">/</span> or <span className="kbd">Ctrl K</span> command
+          <br />
+          drag to reorder
         </div>
       </nav>
     </>
+  )
+}
+
+function DropLine({ edge }: { edge: 'top' | 'bottom' }) {
+  return (
+    <span
+      className={cx(
+        'pointer-events-none absolute inset-x-1 z-10 h-0.5 rounded bg-accent shadow-[0_0_6px_var(--color-accent)]',
+        edge === 'top' ? '-top-px' : '-bottom-px',
+      )}
+    />
   )
 }
 
@@ -155,7 +180,7 @@ function NavLink({ active, glyph, label, href, kbd }: { active: boolean; glyph: 
     >
       <span className={cx('grid h-5 w-6 place-items-center rounded text-[10.5px]', active ? 'text-accent glow' : 'text-faint')}>{glyph}</span>
       <span className="flex-1">{label}</span>
-      <span className="text-[10px] text-faint">{kbd}</span>
+      <span className="text-[10px] text-faint tabular-nums">{kbd}</span>
     </a>
   )
 }

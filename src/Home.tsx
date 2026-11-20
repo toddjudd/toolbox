@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ClipboardEvent as ReactClipboardEvent } from 'react'
-import { TOOLS } from './tools/registry'
+import { shortcutLabel, useDragReorder, useToolOrder } from './tools/order'
 import { detect } from './lib/detect'
 import { usePersistent } from './lib/store'
 import { useNow } from './lib/hooks'
@@ -59,6 +59,8 @@ export default function Home({ onPalette }: { onPalette: () => void }) {
   const [q, setQ] = useState('')
   const target = resolveSearch(q)
   const searchRef = useRef<HTMLInputElement>(null)
+  const { tools, move } = useToolOrder()
+  const { dragId, dropIndex, itemProps } = useDragReorder(move, 'x')
 
   useEffect(() => {
     searchRef.current?.focus()
@@ -141,22 +143,28 @@ export default function Home({ onPalette }: { onPalette: () => void }) {
             <div className="label mb-2 flex items-center justify-between">
               <span>tools</span>
               <button className="normal-case tracking-normal text-faint hover:text-accent" onClick={onPalette}>
-                Ctrl K for everything
+                drag to reorder · Ctrl K for everything
               </button>
             </div>
             <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
-              {TOOLS.map((t, i) => (
+              {tools.map((t, i) => (
                 <a
                   key={t.id}
                   href={`#/${t.id}`}
-                  className="group flex flex-col gap-1.5 rounded-lg border border-line bg-panel/80 p-3 transition hover:-translate-y-px hover:border-accent/60 hover:shadow-[0_0_24px_-10px_color-mix(in_srgb,var(--color-accent)_70%,transparent)]"
+                  {...itemProps(t.id, i)}
+                  className={cx(
+                    'group relative flex flex-col gap-1.5 rounded-lg border border-line bg-panel/80 p-3 transition hover:-translate-y-px hover:border-accent/60 hover:shadow-[0_0_24px_-10px_color-mix(in_srgb,var(--color-accent)_70%,transparent)]',
+                    dragId === t.id && 'opacity-40',
+                    dragId && dropIndex === i && 'before:absolute before:inset-y-1 before:-left-1.5 before:w-0.5 before:rounded before:bg-accent',
+                    dragId && dropIndex === i + 1 && 'after:absolute after:inset-y-1 after:-right-1.5 after:w-0.5 after:rounded after:bg-accent',
+                  )}
                 >
                   <div className="flex items-center gap-2">
                     <span className="grid h-7 w-8 place-items-center rounded border border-line-2 text-[11px] text-dim transition group-hover:border-accent/60 group-hover:text-accent group-hover:glow">
                       {t.glyph}
                     </span>
                     <span className="flex-1 text-[13px] text-fg group-hover:text-accent">{t.name}</span>
-                    {i < 9 && <span className="text-[10px] text-faint">alt {i + 1}</span>}
+                    {shortcutLabel(i) && <span className="text-[10px] text-faint">{shortcutLabel(i, 'alt ')}</span>}
                   </div>
                   <span className="text-[11px] leading-snug text-faint">{t.desc}</span>
                 </a>
