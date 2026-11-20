@@ -111,8 +111,8 @@ function TopBar({ onPalette, onMenu }: { onPalette: () => void; onMenu: () => vo
 }
 
 function Sidebar({ current, open, onClose }: { current: string; open: boolean; onClose: () => void }) {
-  const { tools, pins, move, clamp, togglePin } = useToolOrder()
-  const { dragId, dropIndex, itemProps } = useDragReorder(move, 'y', clamp)
+  const { tools, move } = useToolOrder()
+  const { dragId, dropIndex, itemProps } = useDragReorder(move)
   return (
     <>
       {open && <div className="fixed inset-0 z-30 bg-black/60 md:hidden" onClick={onClose} />}
@@ -124,26 +124,13 @@ function Sidebar({ current, open, onClose }: { current: string; open: boolean; o
       >
         <NavLink active={current === ''} glyph="~" label="home" href="#/" kbd="0" />
         <div className="label mt-3 mb-1 px-2 text-[10px]">tools</div>
-        {tools.map((t, i) => {
-          const pinned = pins.includes(t.id)
-          return (
-            <div key={t.id} {...itemProps(t.id, i)} className={cx('group relative', dragId === t.id && 'opacity-40')}>
-              {dropIndex === i && dragId && <DropLine edge="top" />}
-              {dropIndex === i + 1 && i === tools.length - 1 && dragId && <DropLine edge="bottom" />}
-              <NavLink active={current === t.id} glyph={t.glyph} label={t.name} href={`#/${t.id}`} kbd={shortcutLabel(i)} />
-              <button
-                onClick={() => togglePin(t.id)}
-                className={cx(
-                  'absolute top-1/2 right-8 -translate-y-1/2 px-1 text-[11px]',
-                  pinned ? 'text-accent/80' : 'text-faint opacity-0 group-hover:opacity-100',
-                )}
-                title={pinned ? 'unpin' : 'pin to top'}
-              >
-                {pinned ? '★' : '☆'}
-              </button>
-            </div>
-          )
-        })}
+        {tools.map((t, i) => (
+          <div key={t.id} {...itemProps(t.id, i)} className={cx('relative', dragId === t.id && 'opacity-40')}>
+            {dropIndex === i && dragId && <DropLine edge="top" />}
+            {dropIndex === i + 1 && i === tools.length - 1 && dragId && <DropLine edge="bottom" />}
+            <NavLink active={current === t.id} glyph={t.glyph} label={t.name} href={`#/${t.id}`} kbd={shortcutLabel(i)} />
+          </div>
+        ))}
         <div className="mt-auto px-2 pt-6 pb-1 text-[10.5px] leading-relaxed text-faint">
           <span className="kbd">Alt</span>+<span className="kbd">1-9</span> jump
           <br />
