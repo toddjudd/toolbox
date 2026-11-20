@@ -111,8 +111,8 @@ function TopBar({ onPalette, onMenu }: { onPalette: () => void; onMenu: () => vo
 }
 
 function Sidebar({ current, open, onClose }: { current: string; open: boolean; onClose: () => void }) {
-  const { tools, pins, move, togglePin } = useToolOrder()
-  const { dragId, dropIndex, itemProps } = useDragReorder(move)
+  const { tools, pins, move, clamp, togglePin } = useToolOrder()
+  const { dragId, dropIndex, itemProps } = useDragReorder(move, 'y', clamp)
   return (
     <>
       {open && <div className="fixed inset-0 z-30 bg-black/60 md:hidden" onClick={onClose} />}

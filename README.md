@@ -8,7 +8,7 @@ Live at **https://toolbox.tjudd.dev**.
 
 - `Ctrl K` / `/`: command palette. Paste anything (JWT, URL, epoch, JSON…) and it opens the right tool.
 - `Alt 1-9`: jump to a tool, `Alt Shift 1-9` for tools 10-18, `Alt 0` home. Numbers follow your tool order.
-- Drag tools on the home page or in the sidebar to reorder them (dropping into the pinned group pins a tool).
+- Drag tools on the home page or in the sidebar to reorder them (stars stay with the tool; pinned tools stay above the rest).
 - Home: clock, search with bangs (`!gh !npm !mdn !so !ciu !claude`), smart paste, quick links, scratchpad.
 - Theme: every color derives from one `--accent` (OKLCH relative colors). Pick it from the footer swatch or `Ctrl K` → "theme".
 - State persists in `localStorage`. A strict CSP (`connect-src 'self'`) means pasted data can't be sent anywhere.

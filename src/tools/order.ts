@@ -32,18 +32,23 @@ export function useToolOrder() {
   const [pins, setPins] = usePersistent<string[]>(PINS_KEY, DEFAULT_PINS)
   const tools = arrange(order, pins)
 
-  /** Move a tool to a display index. Landing inside the pinned group pins it, landing below unpins it. */
+  /**
+   * Move a tool to a display index. Pins stay with the tool: `arrange` regroups pinned tools
+   * first, so dropping across the pinned/unpinned boundary lands at the edge of the tool's own group.
+   */
   const move = (id: string, to: number) => {
     const ids = tools.map((t) => t.id)
     const from = ids.indexOf(id)
     if (from === -1) return
     ids.splice(from, 1)
     ids.splice(to > from ? to - 1 : to, 0, id)
-    const at = ids.indexOf(id)
-    const pinnedOthers = ids.filter((x) => x !== id && pins.includes(x)).length
-    const shouldPin = at < pinnedOthers || (pins.includes(id) && at === pinnedOthers)
     setOrder(ids)
-    if (shouldPin !== pins.includes(id)) setPins((p) => (shouldPin ? [...p, id] : p.filter((x) => x !== id)))
+  }
+
+  /** Nearest index a tool can actually land at without leaving its pinned/unpinned group. */
+  const clamp = (id: string, to: number) => {
+    const pinnedCount = tools.filter((t) => pins.includes(t.id)).length
+    return pins.includes(id) ? Math.min(to, pinnedCount) : Math.max(to, pinnedCount)
   }
 
   const togglePin = (id: string) => {
@@ -52,14 +57,18 @@ export function useToolOrder() {
     setPins((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
   }
 
-  return { tools, pins, move, togglePin }
+  return { tools, pins, move, clamp, togglePin }
 }
 
 /**
  * Native HTML5 drag-to-reorder. Spread `itemProps(id, index)` on each draggable element;
  * `dropIndex` is where the dragged item would land (render an indicator before that index).
  */
-export function useDragReorder(move: (id: string, to: number) => void, axis: 'x' | 'y' = 'y') {
+export function useDragReorder(
+  move: (id: string, to: number) => void,
+  axis: 'x' | 'y' = 'y',
+  clamp: (id: string, to: number) => number = (_, to) => to,
+) {
   const [dragId, setDragId] = useState<string | null>(null)
   const [dropIndex, setDropIndex] = useState<number | null>(null)
 
@@ -81,7 +90,7 @@ export function useDragReorder(move: (id: string, to: number) => void, axis: 'x'
       e.dataTransfer.dropEffect = 'move'
       const r = e.currentTarget.getBoundingClientRect()
       const after = axis === 'y' ? e.clientY > r.top + r.height / 2 : e.clientX > r.left + r.width / 2
-      setDropIndex(after ? index + 1 : index)
+      setDropIndex(clamp(dragId, after ? index + 1 : index))
     },
     onDrop: (e: DragEvent<HTMLElement>) => {
       if (!dragId) return

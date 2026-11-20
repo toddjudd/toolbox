@@ -59,8 +59,8 @@ export default function Home({ onPalette }: { onPalette: () => void }) {
   const [q, setQ] = useState('')
   const target = resolveSearch(q)
   const searchRef = useRef<HTMLInputElement>(null)
-  const { tools, move } = useToolOrder()
-  const { dragId, dropIndex, itemProps } = useDragReorder(move, 'x')
+  const { tools, move, clamp } = useToolOrder()
+  const { dragId, dropIndex, itemProps } = useDragReorder(move, 'x', clamp)
 
   useEffect(() => {
     searchRef.current?.focus()
